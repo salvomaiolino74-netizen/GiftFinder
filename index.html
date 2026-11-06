@@ -3,26 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiftFinder AI - Trova il Regalo Perfetto</title>
-    <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>GiftFinder AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState } = React;
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 pb-20">
+    <div id="app" class="max-w-md mx-auto">
+        <header class="text-center my-6">
+            <h1 class="text-3xl font-extrabold text-emerald-400">GiftFinder AI</h1>
+            <p class="text-slate-400 text-xs mt-1">Trova il regalo perfetto e confronta i prezzi</p>
+        </header>
 
-        const REGALI_DATABASE = [
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl">
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Cosa cerca il destinatario?</label>
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Es. Cucina, Tech, Sport..." 
+                oninput="filtraProdotti()"
+                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 mb-4"
+            >
+
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-semibold text-slate-300">Budget massimo:</span>
+                <span id="budgetText" class="text-xs font-bold text-emerald-400">100 €</span>
+            </div>
+            <input 
+                type="range" 
+                id="budgetRange" 
+                min="20" 
+                max="100" 
+                value="100" 
+                oninput="filtraProdotti()"
+                class="w-full accent-emerald-500 cursor-pointer"
+            >
+        </div>
+
+        <div id="prodottiList" class="space-y-4"></div>
+    </div>
+
+    <script>
+        const database = [
             {
                 id: 1,
                 titolo: "Pietra Refrattaria per Pizza con Pala Inox",
                 categoria: "Cucina & Pizza",
-                prezzoConsigliato: 39.99,
+                prezzo: 34.90,
                 immagine: "🍕",
                 offerte: [
                     { store: "Amazon", prezzo: 34.90, spedizione: "Gratis" },
-                    { store: "eBay", prezzo: 38.50, spedizione: "2.99€"
+                    { store: "eBay", prezzo: 38.50, spedizione: "2.99€" }
+                ]
+            },
+            {
+                id: 2,
+                titolo: "Zaino per Calisthenics & Fitness",
+                categoria: "Sport & Fitness",
+                prezzo: 54.90,
+                immagine: "🎒",
+                offerte: [
+                    { store: "Amazon", prezzo: 54.90, spedizione: "Gratis" },
+                    { store: "Decathlon", prezzo: 59.99, spedizione: "Gratis" }
+                ]
+            },
+            {
+                id: 3,
+                titolo: "Cuffie Bluetooth Wireless",
+                categoria: "Tecnologia",
+                prezzo: 69.99,
+                immagine: "🎧",
+                offerte: [
+                    { store: "Amazon", prezzo: 69.99, spedizione: "Gratis" },
+                    { store: "MediaWorld", prezzo: 74.99, spedizione: "Gratis" }
+                ]
+            }
+        ];
 
+        function filtraProdotti() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const maxBudget = Number(document.getElementById('budgetRange').value);
+            document.getElementById('budgetText').innerText = maxBudget + " €";
 
+            const filtrati = database.filter(item => {
+                const matchTesto = item.titolo.toLowerCase().includes(query) || item.categoria.toLowerCase().includes(query);
+                const matchBudget = item.prezzo <= maxBudget;
+                return matchTesto && matchBudget;
+            });
+
+            const container = document.getElementById('prodottiList');
+            if (filtrati.length === 0) {
+                container.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">Nessun regalo trovato con questo budget o ricerca.</p>';
+                return;
+            }
+
+            container.innerHTML = filtrati.map(item => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-3xl bg-slate-800 p-2 rounded-xl">${item.immagine}</span>
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-100">${item.titolo}</h2>
+                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-medium">
+                                ${item.categoria}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="border-t border-slate-800 pt-3 mt-2">
+                        <p class="text-[11px] font-semibold text-slate-400 mb-2">Migliori prezzi:</p>
+                        <div class="space-y-1.5">
+                            ${item.offerte.map(off => `
+                                <div class="flex justify-between items-center bg-slate-950/60 px-3 py-1.5 rounded-xl text-xs">
+                                    <span class="font-medium text-slate-300">${off.store}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-slate-400 text-[10px]">${off.spedizione}</span>
+                                        <span class="font-bold text-emerald-400">${off.prezzo.toFixed(2)} €</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        filtraProdotti();
+    </script>
+</body>
+</html>
