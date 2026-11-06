@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiftFinder AI - Assistente Regali</title>
+    <title>GiftFinder AI - Assistente Regali & Offerte</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -14,7 +14,7 @@
         <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
             <i class="fa-solid fa-gift mr-2 text-emerald-400"></i>GiftFinder AI
         </h1>
-        <p class="text-slate-400 text-xs mt-0.5">Il tuo assistente personale per regali perfetti</p>
+        <p class="text-slate-400 text-xs mt-0.5">Trova l'offerta migliore in tempo reale</p>
     </header>
 
     <!-- Main Container -->
@@ -23,13 +23,13 @@
         <!-- Chat Feed -->
         <div id="chatFeed" class="space-y-4 mb-4 overflow-y-auto max-h-[65vh] pr-1">
             <!-- Messaggio di benvenuto dell'IA -->
-            <div class="flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl animate-fade-in">
+            <div class="flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl">
                 <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
                     AI
                 </div>
                 <div class="text-xs leading-relaxed text-slate-200 space-y-2">
-                    <p class="font-bold text-emerald-400 text-sm">Ciao! Sono il tuo assistente per i regali.</p>
-                    <p>Per iniziare, dimmi: <strong>chi è il destinatario</strong> (es. familiare, amico, partner, altro)?</p>
+                    <p class="font-bold text-emerald-400 text-sm">Ciao! Sono il tuo cacciatore di offerte.</p>
+                    <p>Per iniziare: <strong>chi è il destinatario</strong> del regalo (es. amico, partner, familiare, altro)?</p>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <input 
                 type="text" 
                 id="userInput" 
-                placeholder="Scrivi qui la tua risposta..." 
+                placeholder="Scrivi la tua risposta..." 
                 required 
                 class="flex-1 bg-transparent text-xs text-slate-100 placeholder-slate-500 px-3 py-3 focus:outline-none"
             />
@@ -55,59 +55,26 @@
     </main>
 
     <script>
-        // Stato della conversazione
         let statoConversazione = 'CHIEDI_DESTINATARIO';
         let datiRegalo = {
             destinatario: '',
             interesse: '',
             budget: '',
-            ricercaLibera: ''
+            prodottoSpecifico: ''
         };
-
-        // Database simulato per comparazione prezzi
-        const databaseIdee = [
-            {
-                match: (dati) => dati.destinatario.includes('amico') || dati.interesse.includes('sport') || dati.ricercaLibera.includes('calisthenics'),
-                titolo: "Kit Completo Calisthenics & Powerlifting",
-                descrizione: "Perfetto per chi ama allenarsi duramente. Include fasce, magnesite liquida e parallele.",
-                offerte: [
-                    { store: "Amazon", prezzo: "49.99 €", link: "https://www.amazon.it/s?k=kit+calisthenics" },
-                    { store: "eBay", prezzo: "45.50 €", link: "https://www.ebay.it/sch/i.html?_nkw=kit+calisthenics" }
-                ]
-            },
-            {
-                match: (dati) => dati.destinatario.includes('partner') || dati.interesse.includes('cucina') || dati.ricercaLibera.includes('pizza'),
-                titolo: "Pietra Refrattaria per Pizza Home Edition",
-                descrizione: "Per sfornare pizze perfette nel forno di casa come in pizzeria.",
-                offerte: [
-                    { store: "Amazon", prezzo: "34.90 €", link: "https://www.amazon.it/s?k=pietra+refrattaria+pizza" },
-                    { store: "eBay", prezzo: "38.50 €", link: "https://www.ebay.it/sch/i.html?_nkw=pietra+refrattaria+pizza" },
-                    { store: "Unieuro", prezzo: "42.00 €", link: "https://www.unieuro.it/online/search?q=pietra+refrattaria" }
-                ]
-            },
-            {
-                match: (dati) => true, // Fallback Generico
-                titolo: "Gift Card Universale Multistore",
-                descrizione: "La scelta ideale per non sbagliare mai, spendibile sui migliori store online.",
-                offerte: [
-                    { store: "Amazon", prezzo: "Opzionale", link: "https://www.amazon.it/b?node=462947031" },
-                    { store: "eBay", prezzo: "Personalizzabile", link: "https://www.ebay.it" }
-                ]
-            }
-        ];
 
         function aggiungiMessaggio(testo, mittente) {
             const chatFeed = document.getElementById('chatFeed');
             const div = document.createElement('div');
             
             if (mittente === 'user') {
-                div.className = 'flex gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl shadow-md justify-end text-right animate-fade-in';
+                div.className = 'flex gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl shadow-md justify-end text-right';
                 div.innerHTML = `
                     <div class="text-xs leading-relaxed text-emerald-200 font-medium">${testo}</div>
                     <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shrink-0">Tu</div>
                 `;
             } else {
-                div.className = 'flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl animate-fade-in';
+                div.className = 'flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl';
                 div.innerHTML = `
                     <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">AI</div>
                     <div class="flex-1 text-xs leading-relaxed text-slate-200 space-y-2">${testo}</div>
@@ -129,61 +96,115 @@
 
             setTimeout(() => {
                 if (statoConversazione === 'CHIEDI_DESTINATARIO') {
-                    datiRegalo.destinatario = testo.toLowerCase();
+                    datiRegalo.destinatario = testo;
                     statoConversazione = 'CHIEDI_INTERESSE';
-                    aggiungiMessaggio("Ottimo! Ora dimmi: <strong>quali sono i suoi interessi principali</strong> o lo sport che pratica (oppure scrivi 'altro')?", 'ai');
+                    aggiungiMessaggio("Perfetto! Che tipo di regalo cerchi o <strong>quali sono le sue passioni</strong> (es. Sport, Moda, Cucina, Tech, o altro)?", 'ai');
                 } 
                 else if (statoConversazione === 'CHIEDI_INTERESSE') {
-                    datiRegalo.interesse = testo.toLowerCase();
+                    datiRegalo.interesse = testo;
                     statoConversazione = 'CHIEDI_BUDGET';
-                    aggiungiMessaggio("Perfetto. Qual è il tuo <strong>budget massimo</strong> in euro per questo regalo?", 'ai');
+                    aggiungiMessaggio("Ottimo. Qual è il tuo <strong>budget massimo</strong> in €?", 'ai');
                 }
                 else if (statoConversazione === 'CHIEDI_BUDGET') {
                     datiRegalo.budget = testo;
-                    statoConversazione = 'RICERCA_LIBERA';
-                    aggiungiMessaggio("Ricevuto! C'è un <strong>oggetto specifico</strong> che hai in mente, oppure vuoi che trovi io l'idea migliore?", 'ai');
+                    statoConversazione = 'CHIEDI_PRODOTTO';
+                    aggiungiMessaggio("Ora dimmi: <strong>cosa vorresti regalargli esattamente</strong> (es. <em>scarpe Nike</em>, <em>pietra refrattaria</em>, <em>cuffie bluetooth</em> o un'idea generica)?", 'ai');
                 }
-                else if (statoConversazione === 'RICERCA_LIBERA') {
-                    datiRegalo.ricercaLibera = testo.toLowerCase();
+                else if (statoConversazione === 'CHIEDI_PRODOTTO') {
+                    datiRegalo.prodottoSpecifico = testo;
                     elaboraRisultatoFinale();
                 }
-            }, 600);
+            }, 500);
+        }
+
+        function generaLinkStore(store, query, budget) {
+            const q = encodeURIComponent(query);
+            switch(store) {
+                case 'Amazon':
+                    // Cerca l'oggetto preciso con filtro sconti/offerte
+                    return `https://www.amazon.it/s?k=${q}&pct-off=10-`;
+                case 'eBay':
+                    // Cerca l'oggetto preciso con prezzo massimo impostato se presente
+                    const maxP = parseFloat(budget) || '';
+                    return `https://www.ebay.it/sch/i.html?_nkw=${q}${maxP ? '&_udhi=' + maxP : ''}&LH_ItemCondition=1000`;
+                case 'Zalando':
+                    return `https://www.zalando.it/catalogo/?q=${q}`;
+                case 'Shein':
+                    return `https://it.shein.com/pdsearch/${q}/`;
+                case 'Unieuro':
+                    return `https://www.unieuro.it/online/search?q=${q}`;
+                default:
+                    return `https://www.google.com/search?q=${q}+offerte+prezzi`;
+            }
         }
 
         function elaboraRisultatoFinale() {
-            // Trova l'idea migliore basata sui dati raccolti
-            const ideaTrovata = databaseIdee.find(item => item.match(datiRegalo)) || databaseIdee[2];
+            const oggettoCercato = datiRegalo.prodottoSpecifico || datiRegalo.interesse;
+            const queryFinale = `${oggettoCercato}`;
+            const budgetText = datiRegalo.budget ? ` (Budget fino a ${datiRegalo.budget}€)` : '';
+
+            // Generazione link dinamici diretti alla ricerca esatta
+            const linkAmazon = generaLinkStore('Amazon', queryFinale, datiRegalo.budget);
+            const linkEbay = generaLinkStore('eBay', queryFinale, datiRegalo.budget);
+            const linkZalando = generaLinkStore('Zalando', queryFinale, datiRegalo.budget);
+            const linkShein = generaLinkStore('Shein', queryFinale, datiRegalo.budget);
+            const linkUnieuro = generaLinkStore('Unieuro', queryFinale, datiRegalo.budget);
 
             let htmlRisposta = `
                 <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 mb-3">
-                    <p class="font-bold text-emerald-400 text-sm mb-1">🎁 Ecco l'idea perfetta!</p>
-                    <p class="font-bold text-white text-base">${ideaTrovata.titolo}</p>
-                    <p class="text-slate-300 text-xs mt-1">${ideaTrovata.descrizione}</p>
+                    <p class="font-bold text-emerald-400 text-sm mb-1">🔍 Ricerca completata per: "${oggettoCercato}"</p>
+                    <p class="text-slate-300 text-xs">Per ${datiRegalo.destinatario} - Categoria: ${datiRegalo.interesse}${budgetText}</p>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 mb-2">Compara le offerte migliori:</p>
+                <p class="text-xs font-semibold text-slate-400 mb-2">Clicca sugli store per aprire direttamente i risultati e le offerte su <strong>"${oggettoCercato}"</strong>:</p>
+                
                 <div class="space-y-2">
+                    <!-- Amazon -->
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs">
+                        <span class="font-bold text-amber-400"><i class="fa-brands fa-amazon mr-1"></i>Amazon</span>
+                        <a href="${linkAmazon}" target="_blank" class="bg-amber-500 text-slate-950 px-3 py-1 rounded-lg font-bold hover:bg-amber-400 transition-all">
+                            Vedi Offerte <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- eBay -->
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs">
+                        <span class="font-bold text-blue-400"><i class="fa-solid fa-tag mr-1"></i>eBay</span>
+                        <a href="${linkEbay}" target="_blank" class="bg-blue-500 text-slate-950 px-3 py-1 rounded-lg font-bold hover:bg-blue-400 transition-all">
+                            Vedi Offerte <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Zalando (Abbigliamento/Sport/Scarpe) -->
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs">
+                        <span class="font-bold text-orange-400"><i class="fa-solid fa-shirt mr-1"></i>Zalando</span>
+                        <a href="${linkZalando}" target="_blank" class="bg-orange-500 text-slate-950 px-3 py-1 rounded-lg font-bold hover:bg-orange-400 transition-all">
+                            Vedi Offerte <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Shein (Moda/Accessori/Economico) -->
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs">
+                        <span class="font-bold text-pink-400"><i class="fa-solid fa-bag-shopping mr-1"></i>Shein</span>
+                        <a href="${linkShein}" target="_blank" class="bg-pink-500 text-slate-950 px-3 py-1 rounded-lg font-bold hover:bg-pink-400 transition-all">
+                            Vedi Offerte <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Unieuro (Elettronica/Tech/Casa) -->
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-2.5 rounded-xl text-xs">
+                        <span class="font-bold text-red-400"><i class="fa-solid fa-plug mr-1"></i>Unieuro</span>
+                        <a href="${linkUnieuro}" target="_blank" class="bg-red-500 text-slate-950 px-3 py-1 rounded-lg font-bold hover:bg-red-400 transition-all">
+                            Vedi Offerte <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                        </a>
+                    </div>
+                </div>
             `;
 
-            ideaTrovata.offerte.forEach(off => {
-                htmlRisposta += `
-                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-3 rounded-xl text-xs">
-                        <span class="font-bold text-slate-200"><i class="fa-solid fa- магазин mr-1 text-slate-500"></i>${off.store}</span>
-                        <div class="flex items-center gap-3">
-                            <span class="text-emerald-400 font-extrabold">${off.prezzo}</span>
-                            <a href="${off.link}" target="_blank" class="bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-400 transition-all shadow-md">
-                                Vai <i class="fa-solid fa-external-link text-[10px] ml-1"></i>
-                            </a>
-                        </div>
-                    </div>
-                `;
-            });
-
-            htmlRisposta += `</div>`;
             aggiungiMessaggio(htmlRisposta, 'ai');
 
-            // Reset conversazione
+            // Reset per la ricerca successiva
             statoConversazione = 'CHIEDI_DESTINATARIO';
-            datiRegalo = { destinatario: '', interesse: '', budget: '', ricercaLibera: '' };
+            datiRegalo = { destinatario: '', interesse: '', budget: '', prodottoSpecifico: '' };
         }
     </script>
 </body>
