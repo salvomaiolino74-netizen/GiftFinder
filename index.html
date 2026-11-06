@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiftFinder AI</title>
+    <title>GiftFinder AI - Trova il Regalo Perfetto</title>
     <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
@@ -12,23 +12,17 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen">
     <div id="root"></div>
     <script type="text/babel">
-        function App() {
-            return (
-                <div className="max-w-md mx-auto p-4 pt-10">
-                    <header className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-emerald-400">GiftFinder AI</h1>
-                        <p className="text-slate-400 text-sm mt-2">Trova il regalo perfetto in pochi secondi</p>
-                    </header>
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl text-center">
-                        <p className="text-lg font-medium text-slate-200">Benvenuto nella tua app!</p>
-                        <p className="text-xs text-slate-500 mt-2">Configurazione completata con successo su GitHub Pages.</p>
-                    </div>
-                </div>
-            );
-        }
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+        const { useState } = React;
+
+        const REGALI_DATABASE = [
+            {
+                id: 1,
+                titolo: "Pietra Refrattaria per Pizza con Pala Inox",
+                categoria: "Cucina & Pizza",
+                prezzoConsigliato: 39.99,
+                immagine: "🍕",
+                offerte: [
+                    { store: "Amazon", prezzo: 34.90, spedizione: "Gratis" },
+                    { store: "eBay", prezzo: 38.50, spedizione: "2.99€"
+
 
