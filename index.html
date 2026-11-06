@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GiftFinder AI</title>
+<!-- Tailwind CSS per la grafica -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- React e Babel per far girare il codice nel browser -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-16 font-sans antialiased">
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
+const REGALI_DATABASE = [
+{
+id: 1,
+titolo: "Pietra Refrattaria per Pizza con Pala Inox",
+categoria: "Cucina & Pizza",
+prezzoConsigliato: 39.99,
+immagine: "🍕",
+offerte: [
+{ store: "Amazon", prezzo: 34.90, spedizione: "Gratis", link: "#", best: true },
+{ store: "eBay", prezzo: 38.50, spedizione: "2.99€", link: "#", best: false },
+{ store: "Unieuro", prezzo: 42.00, spedizione: "Gratis", link: "#", best: false }
+],
+tags: ["Cucina", "Pizza", "Casa"]
+},
+{
+id: 2,
+titolo: "Set Manubri Regolabili da Palestra 20kg",
+categoria: "Sport & Fitness",
+prezzoConsigliato: 89.99,
+immagine: "🏋️‍♂️",
+offerte: [
+{ store: "Decathlon", prezzo: 74.99, spedizione: "Gratis", link: "#", best: true },
+{ store: "Amazon", prezzo: 79.99, spedizione: "Gratis", link: "#", best: false }
+],
+tags: ["Sport", "Fitness", "Casa"]
+},
+{
+id: 3,
+titolo: "Cuffie Wireless Noise Cancelling Over-Ear",
+categoria: "Tech & Gaming",
+prezzoConsigliato: 129.99,
+immagine: "🎧",
+offerte: [
+{ store: "MediaWorld", prezzo: 99.00, spedizione: "Gratis", link: "#", best: true },
+{ store: "Amazon", prezzo: 104.99, spedizione: "Gratis", link: "#", best: false },
+{ store: "Unieuro", prezzo: 119.00, spedizione: "4.99€", link: "#", best: false }
+],
+tags: ["Musica", "Tech & Gaming", "Studio"]
+},
+{
+id: 4,
+titolo: "Supporto Smartphone Auto Wireless MagSafe",
+categoria: "Motori",
+prezzoConsigliato: 24.99,
+immagine: "🚗",
+offerte: [
+{ store: "Amazon", prezzo: 19.99, spedizione: "Gratis Prime", link: "#", best: true },
+{ store: "eBay", prezzo: 22.90, spedizione: "Gratis", link: "#", best: false }
+],
+tags: ["Motori", "Tech & Gaming"]
+}
+];
+function App() {
+const [step, setStep] = useState(1);
+const [destinatario, setDestinatario] = useState('Amico/a');
+const [interesse, setInteresse] = useState('Tutti');
+const [budget, setBudget] = useState(50);
+const [preferiti, setPreferiti] = useState([]);
+const [tabAttiva, setTabAttiva] = useState('wizard');
+const togglePreferito = (id) => {
+if (preferiti.includes(id)) {
+setPreferiti(preferiti.filter(item => item !== id));
+} else {
+setPreferiti([...preferiti, id]);
+}
+};
+const risultatiFiltrati = REGALI_DATABASE.filter(regalo => {
+const migliorPrezzo = regalo.offerte[0].prezzo;
+const rispettaBudget = migliorPrezzo <= budget;
+const rispettaInteresse = interesse === 'Tutti' || regalo.tags.includes(interesse);
+return rispettaBudget && rispettaInteresse;
+});
+return (
+<div className="max-w-md mx-auto p-4 space-y-6">
+<div className="text-center space-y-1">
+<h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-500">
+GiftFinder AI 🎁
+</h1>
+<p className="text-xs text-slate-400">Trova il regalo perfetto al miglior prezzo web</p>
+</div>
+<div className="flex bg-slate-900 p-1 rounded-xl text-xs font-semibold border border-slate-800">
+<button
+onClick={() => setTabAttiva('wizard')}
+className={⁠flex-1 py-2.5 rounded-lg transition ${tabAttiva === 'wizard' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400'}⁠}>
+🔍 Trova Regalo
+</button>
+<button
+onClick={() => setTabAttiva('risultati')}
+className={⁠flex-1 py-2.5 rounded-lg transition ${tabAttiva === 'risultati' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400'}⁠}>
+🛍️ Offerte ({risultatiFiltrati.length})
+</button>
+<button
+onClick={() => setTabAttiva('cassaComune')}
+className={⁠flex-1 py-2.5 rounded-lg transition ${tabAttiva === 'cassaComune' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400'}⁠}>
+👥 Cassa Comune
+</button>
+</div>
+{tabAttiva === 'wizard' && (
+<div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-5 shadow-xl">
+<div className="flex justify-between items-center border-b border-slate-800 pb-3">
+<span className="text-sm font-bold text-indigo-400">Step {step} di 3</span>
+<span className="text-xs text-slate-400">Configuratore Rapido</span>
+</div>
+{step === 1 && (
+<div className="space-y-3">
+<label className="text-sm font-medium text-slate-200">Per chi è il regalo?</label>
+<div className="grid grid-cols-2 gap-2">
+{['Partner', 'Amico/a', 'Familiare', 'Collega'].map((opzione) => (
+<button
+key={opzione}
+onClick={() => setDestinatario(opzione)}
+className={⁠p-3 rounded-xl text-left border text-sm transition ${destinatario === opzione ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700/60 text-slate-300'}⁠}>
+{opzione}
+</button>
+))}
+</div>
+<button onClick={() => setStep(2)} className="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
+Avanti ➔
+</button>
+</div>
+)}
+{step === 2 && (
+<div className="space-y-3">
+<label className="text-sm font-medium text-slate-200">Qual è la sua passione?</label>
+<div className="grid grid-cols-2 gap-2">
+{['Tutti', 'Cucina', 'Fitness', 'Musica', 'Motori', 'Tech & Gaming'].map((cat) => (
+<button
+key={cat}
+onClick={() => setInteresse(cat)}
+className={⁠p-3 rounded-xl text-left border text-sm transition ${interesse === cat ? 'bg-indigo-600/30 border-indigo-500 text-white' : 'bg-slate-800 border-slate-700/60 text-slate-300'}⁠}>
+{cat}
+</button>
+))}
+</div>
+<div className="flex gap-2 mt-4">
+<button onClick={() => setStep(1)} className="w-1/3 bg-slate-800 text-slate-300 py-3 rounded-xl text-sm">Indietro</button>
+<button onClick={() => setStep(3)} className="w-2/3 bg-indigo-600 text-white font-bold py-3 rounded-xl text-sm">Avanti ➔</button>
+</div>
+</div>
+)}
+{step === 3 && (
+<div className="space-y-4">
+<label className="text-sm font-medium text-slate-200">Budget massimo: <span className="text-emerald-400 font-bold">{budget} €</span></label>
+<input
+type="range"
+min="10"
+max="200"
+step="5"
+value={budget}
+onChange={(e) => setBudget(Number(e.target.value))}
+className="w-full accent-indigo-500 cursor-pointer"
+/>
+<div className="flex justify-between text-xs text-slate-400">
+<span>10 €</span>
+<span>100 €</span>
+<span>200 €+</span>
+</div>
+<div className="flex gap-2 mt-4">
+<button onClick={() => setStep(2)} className="w-1/3 bg-slate-800 text-slate-300 py-3 rounded-xl text-sm">Indietro</button>
+<button
+onClick={() => setTabAttiva('risultati')}
+className="w-2/3 bg-gradient-to-r from-emerald-500 via-indigo-600 to-purple-600 text-white font-bold py-3 rounded-xl text-sm shadow-xl">
+Mostra Risultati ({risultatiFiltrati.length})
+</button>
+</div>
+</div>
+)}
+</div>
+)}
+{tabAttiva === 'risultati' && (
+<div className="space-y-4">
+<div className="flex justify-between items-center text-xs text-slate-400 px-1">
+<span>Per: <strong className="text-slate-200">{destinatario}</strong> ({interesse})</span>
+<span>Max: <strong className="text-emerald-400">{budget}€</strong></span>
+</div>
+{risultatiFiltrati.length === 0 ? (
+<div className="bg-slate-900 p-8 rounded-2xl text-center space-y-3 border border-slate-800">
+<p className="text-3xl">😅</p>
+<p className="text-sm text-slate-300">Nessun regalo trovato entro il budget impostato.</p>
+<button onClick={() => { setBudget(150); setInteresse('Tutti'); }} className="text-xs text-indigo-400 underline">
+Alza il budget o azzera i filtri
+</button>
+</div>
+) : (
+risultatiFiltrati.map((item) => (
+<div key={item.id} className="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-3 relative shadow-lg">
+<button
+onClick={() => togglePreferito(item.id)}
+className="absolute top-4 right-4 text-lg">
+{preferiti.includes(item.id) ? '❤️' : '🤍'}
+</button>
+<div className="flex items-center gap-3">
+<div className="text-4xl bg-slate-950 p-3 rounded-xl border border-slate-800">{item.immagine}</div>
+<div>
+<h3 className="font-bold text-sm text-white pr-6">{item.titolo}</h3>
+<p className="text-xs text-slate-400">Listino: <span className="line-through">{item.prezzoConsigliato}€</span></p>
+</div>
+</div>
+<div className="bg-slate-950/80 p-3 rounded-xl space-y-2 text-xs border border-slate-800/80">
+<span className="font-semibold text-slate-400 text-[10px] uppercase tracking-wider block">Migliori Prezzi sul Web:</span>
+{item.offerte.map((off, idx) => (
+<div key={idx} className="flex justify-between items-center py-1 border-b border-slate-800/60 last:border-0">
+<div className="flex items-center gap-2">
+<span className="font-medium text-slate-200">{off.store}</span>
+{off.best && <span className="bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.5 rounded font-bold border border-emerald-500/30">MIGLIOR PREZZO</span>}
+</div>
+<div className="flex items-center gap-3">
+<span className="font-bold text-white">{off.prezzo.toFixed(2)} €</span>
+<a href={off.link} className="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] px-2.5 py-1 rounded-lg font-bold">
+Vedi ➔
+</a>
+</div>
+</div>
+))}
+</div>
+</div>
+))
+)}
+</div>
+)}
+{tabAttiva === 'cassaComune' && (
+<div className="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+<h2 className="font-bold text-base text-white">Cassa Comune: Compleanno Marco 🎂</h2>
+<p className="text-xs text-slate-400">Oggetto: Cuffie Wireless (99.00 €)</p>
+<div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+<div className="bg-gradient-to-r from-emerald-500 to-indigo-500 h-full w-[66%]"></div>
+</div>
+<div className="flex justify-between text-xs font-semibold">
+<span className="text-emerald-400">Raccolti: 66.00 €</span>
+<span className="text-slate-400">Mancano: 33.00 €</span>
+</div>
+<div className="space-y-2 pt-2">
+<p className="text-xs font-bold text-slate-300">Stato Partecipanti:</p>
+{[
+{ nome: "Tu (Organizzatore)", quota: "33.00 €", pagato: true },
+{ nome: "Luca G.", quota: "33.00 €", pagato: true },
+{ nome: "Matteo R.", quota: "33.00 €", pagato: false }
+].map((p, i) => (
+<div key={i} className="flex justify-between items-center text-xs p-2.5 bg-slate-950 rounded-xl border border-slate-800/60">
+<span className="text-slate-200">{p.nome}</span>
+<span className={p.pagato ? 'text-emerald-400 font-bold' : 'text-amber-400 font-medium'}>
+{p.quota} {p.pagato ? '✓ Pagato' : '⏳ In attesa'}
+</span>
+</div>
+))}
+</div>
+</div>
+)}
+</div>
+);
+}
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
