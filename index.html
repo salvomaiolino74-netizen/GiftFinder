@@ -3,128 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GiftFinder AI</title>
+    <title>GiftFinder AI - Assistente Regali</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 pb-20">
-    <div id="app" class="max-w-md mx-auto">
-        <header class="text-center my-6">
-            <h1 class="text-3xl font-extrabold text-emerald-400">GiftFinder AI</h1>
-            <p class="text-slate-400 text-xs mt-1">Trova il regalo perfetto e confronta i prezzi</p>
-        </header>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-6 shadow-xl">
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Cosa cerca il destinatario?</label>
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Es. Cucina, Tech, Sport..." 
-                oninput="filtraProdotti()"
-                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 mb-4"
-            >
+    <!-- Header App -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 p-4 text-center">
+        <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+            <i class="fa-solid fa-gift mr-2 text-emerald-400"></i>GiftFinder AI
+        </h1>
+        <p class="text-slate-400 text-xs mt-0.5">Il tuo assistente personale per regali perfetti</p>
+    </header>
 
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-semibold text-slate-300">Budget massimo:</span>
-                <span id="budgetText" class="text-xs font-bold text-emerald-400">100 €</span>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 flex flex-col justify-between">
+        
+        <!-- Chat Feed -->
+        <div id="chatFeed" class="space-y-4 mb-4 overflow-y-auto max-h-[65vh] pr-1">
+            <!-- Messaggio di benvenuto dell'IA -->
+            <div class="flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl animate-fade-in">
+                <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">
+                    AI
+                </div>
+                <div class="text-xs leading-relaxed text-slate-200 space-y-2">
+                    <p class="font-bold text-emerald-400 text-sm">Ciao! Sono il tuo assistente per i regali.</p>
+                    <p>Per iniziare, dimmi: <strong>chi è il destinatario</strong> (es. familiare, amico, partner, altro)?</p>
+                </div>
             </div>
-            <input 
-                type="range" 
-                id="budgetRange" 
-                min="20" 
-                max="100" 
-                value="100" 
-                oninput="filtraProdotti()"
-                class="w-full accent-emerald-500 cursor-pointer"
-            >
         </div>
 
-        <div id="prodottiList" class="space-y-4"></div>
-    </div>
+        <!-- Input Form -->
+        <form id="chatForm" onsubmit="gestisciFlussoConversazione(event)" class="sticky bottom-4 bg-slate-900 border border-slate-800 p-2 rounded-2xl shadow-2xl flex items-center gap-2">
+            <input 
+                type="text" 
+                id="userInput" 
+                placeholder="Scrivi qui la tua risposta..." 
+                required 
+                class="flex-1 bg-transparent text-xs text-slate-100 placeholder-slate-500 px-3 py-3 focus:outline-none"
+            />
+            <button 
+                type="submit" 
+                class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-3 rounded-xl font-bold text-xs flex items-center gap-1 transition-all shrink-0"
+            >
+                <span>Invia</span>
+                <i class="fa-solid fa-paper-plane text-[10px]"></i>
+            </button>
+        </form>
+
+    </main>
 
     <script>
-        const database = [
+        // Stato della conversazione
+        let statoConversazione = 'CHIEDI_DESTINATARIO';
+        let datiRegalo = {
+            destinatario: '',
+            interesse: '',
+            budget: '',
+            ricercaLibera: ''
+        };
+
+        // Database simulato per comparazione prezzi
+        const databaseIdee = [
             {
-                id: 1,
-                titolo: "Pietra Refrattaria per Pizza con Pala Inox",
-                categoria: "Cucina & Pizza",
-                prezzo: 34.90,
-                immagine: "🍕",
+                match: (dati) => dati.destinatario.includes('amico') || dati.interesse.includes('sport') || dati.ricercaLibera.includes('calisthenics'),
+                titolo: "Kit Completo Calisthenics & Powerlifting",
+                descrizione: "Perfetto per chi ama allenarsi duramente. Include fasce, magnesite liquida e parallele.",
                 offerte: [
-                    { store: "Amazon", prezzo: 34.90, spedizione: "Gratis" },
-                    { store: "eBay", prezzo: 38.50, spedizione: "2.99€" }
+                    { store: "Amazon", prezzo: "49.99 €", link: "https://www.amazon.it/s?k=kit+calisthenics" },
+                    { store: "eBay", prezzo: "45.50 €", link: "https://www.ebay.it/sch/i.html?_nkw=kit+calisthenics" }
                 ]
             },
             {
-                id: 2,
-                titolo: "Zaino per Calisthenics & Fitness",
-                categoria: "Sport & Fitness",
-                prezzo: 54.90,
-                immagine: "🎒",
+                match: (dati) => dati.destinatario.includes('partner') || dati.interesse.includes('cucina') || dati.ricercaLibera.includes('pizza'),
+                titolo: "Pietra Refrattaria per Pizza Home Edition",
+                descrizione: "Per sfornare pizze perfette nel forno di casa come in pizzeria.",
                 offerte: [
-                    { store: "Amazon", prezzo: 54.90, spedizione: "Gratis" },
-                    { store: "Decathlon", prezzo: 59.99, spedizione: "Gratis" }
+                    { store: "Amazon", prezzo: "34.90 €", link: "https://www.amazon.it/s?k=pietra+refrattaria+pizza" },
+                    { store: "eBay", prezzo: "38.50 €", link: "https://www.ebay.it/sch/i.html?_nkw=pietra+refrattaria+pizza" },
+                    { store: "Unieuro", prezzo: "42.00 €", link: "https://www.unieuro.it/online/search?q=pietra+refrattaria" }
                 ]
             },
             {
-                id: 3,
-                titolo: "Cuffie Bluetooth Wireless",
-                categoria: "Tecnologia",
-                prezzo: 69.99,
-                immagine: "🎧",
+                match: (dati) => true, // Fallback Generico
+                titolo: "Gift Card Universale Multistore",
+                descrizione: "La scelta ideale per non sbagliare mai, spendibile sui migliori store online.",
                 offerte: [
-                    { store: "Amazon", prezzo: 69.99, spedizione: "Gratis" },
-                    { store: "MediaWorld", prezzo: 74.99, spedizione: "Gratis" }
+                    { store: "Amazon", prezzo: "Opzionale", link: "https://www.amazon.it/b?node=462947031" },
+                    { store: "eBay", prezzo: "Personalizzabile", link: "https://www.ebay.it" }
                 ]
             }
         ];
 
-        function filtraProdotti() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const maxBudget = Number(document.getElementById('budgetRange').value);
-            document.getElementById('budgetText').innerText = maxBudget + " €";
-
-            const filtrati = database.filter(item => {
-                const matchTesto = item.titolo.toLowerCase().includes(query) || item.categoria.toLowerCase().includes(query);
-                const matchBudget = item.prezzo <= maxBudget;
-                return matchTesto && matchBudget;
-            });
-
-            const container = document.getElementById('prodottiList');
-            if (filtrati.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-500 text-sm py-8">Nessun regalo trovato con questo budget o ricerca.</p>';
-                return;
+        function aggiungiMessaggio(testo, mittente) {
+            const chatFeed = document.getElementById('chatFeed');
+            const div = document.createElement('div');
+            
+            if (mittente === 'user') {
+                div.className = 'flex gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl shadow-md justify-end text-right animate-fade-in';
+                div.innerHTML = `
+                    <div class="text-xs leading-relaxed text-emerald-200 font-medium">${testo}</div>
+                    <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center font-bold text-xs shrink-0">Tu</div>
+                `;
+            } else {
+                div.className = 'flex gap-3 bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl animate-fade-in';
+                div.innerHTML = `
+                    <div class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm shrink-0">AI</div>
+                    <div class="flex-1 text-xs leading-relaxed text-slate-200 space-y-2">${testo}</div>
+                `;
             }
 
-            container.innerHTML = filtrati.map(item => `
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="text-3xl bg-slate-800 p-2 rounded-xl">${item.immagine}</span>
-                        <div>
-                            <h2 class="text-sm font-bold text-slate-100">${item.titolo}</h2>
-                            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-medium">
-                                ${item.categoria}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="border-t border-slate-800 pt-3 mt-2">
-                        <p class="text-[11px] font-semibold text-slate-400 mb-2">Migliori prezzi:</p>
-                        <div class="space-y-1.5">
-                            ${item.offerte.map(off => `
-                                <div class="flex justify-between items-center bg-slate-950/60 px-3 py-1.5 rounded-xl text-xs">
-                                    <span class="font-medium text-slate-300">${off.store}</span>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-slate-400 text-[10px]">${off.spedizione}</span>
-                                        <span class="font-bold text-emerald-400">${off.prezzo.toFixed(2)} €</span>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            chatFeed.appendChild(div);
+            chatFeed.scrollTop = chatFeed.scrollHeight;
         }
 
-        filtraProdotti();
+        function gestisciFlussoConversazione(e) {
+            e.preventDefault();
+            const input = document.getElementById('userInput');
+            const testo = input.value.trim();
+            if (!testo) return;
+
+            aggiungiMessaggio(testo, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                if (statoConversazione === 'CHIEDI_DESTINATARIO') {
+                    datiRegalo.destinatario = testo.toLowerCase();
+                    statoConversazione = 'CHIEDI_INTERESSE';
+                    aggiungiMessaggio("Ottimo! Ora dimmi: <strong>quali sono i suoi interessi principali</strong> o lo sport che pratica (oppure scrivi 'altro')?", 'ai');
+                } 
+                else if (statoConversazione === 'CHIEDI_INTERESSE') {
+                    datiRegalo.interesse = testo.toLowerCase();
+                    statoConversazione = 'CHIEDI_BUDGET';
+                    aggiungiMessaggio("Perfetto. Qual è il tuo <strong>budget massimo</strong> in euro per questo regalo?", 'ai');
+                }
+                else if (statoConversazione === 'CHIEDI_BUDGET') {
+                    datiRegalo.budget = testo;
+                    statoConversazione = 'RICERCA_LIBERA';
+                    aggiungiMessaggio("Ricevuto! C'è un <strong>oggetto specifico</strong> che hai in mente, oppure vuoi che trovi io l'idea migliore?", 'ai');
+                }
+                else if (statoConversazione === 'RICERCA_LIBERA') {
+                    datiRegalo.ricercaLibera = testo.toLowerCase();
+                    elaboraRisultatoFinale();
+                }
+            }, 600);
+        }
+
+        function elaboraRisultatoFinale() {
+            // Trova l'idea migliore basata sui dati raccolti
+            const ideaTrovata = databaseIdee.find(item => item.match(datiRegalo)) || databaseIdee[2];
+
+            let htmlRisposta = `
+                <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 mb-3">
+                    <p class="font-bold text-emerald-400 text-sm mb-1">🎁 Ecco l'idea perfetta!</p>
+                    <p class="font-bold text-white text-base">${ideaTrovata.titolo}</p>
+                    <p class="text-slate-300 text-xs mt-1">${ideaTrovata.descrizione}</p>
+                </div>
+                <p class="text-xs font-semibold text-slate-400 mb-2">Compara le offerte migliori:</p>
+                <div class="space-y-2">
+            `;
+
+            ideaTrovata.offerte.forEach(off => {
+                htmlRisposta += `
+                    <div class="flex justify-between items-center bg-slate-950 border border-slate-800 p-3 rounded-xl text-xs">
+                        <span class="font-bold text-slate-200"><i class="fa-solid fa- магазин mr-1 text-slate-500"></i>${off.store}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-emerald-400 font-extrabold">${off.prezzo}</span>
+                            <a href="${off.link}" target="_blank" class="bg-emerald-500 text-slate-950 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-400 transition-all shadow-md">
+                                Vai <i class="fa-solid fa-external-link text-[10px] ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            htmlRisposta += `</div>`;
+            aggiungiMessaggio(htmlRisposta, 'ai');
+
+            // Reset conversazione
+            statoConversazione = 'CHIEDI_DESTINATARIO';
+            datiRegalo = { destinatario: '', interesse: '', budget: '', ricercaLibera: '' };
+        }
     </script>
 </body>
 </html>
